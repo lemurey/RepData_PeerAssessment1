@@ -28,7 +28,7 @@ dailymedian <- median(dailysteps$x,na.rm=TRUE)
 
 library(ggplot2)
 png(file = 'dailytotalhist.png',
-    width = 480,
+    width = 640,
     height = 480,
     bg = 'transparent')
 g <- ggplot(dailysteps,aes(x))
@@ -49,21 +49,23 @@ averagesteps <- aggregate(list('mean' = activity[,1])
 
 
 png(file = 'averageactivity.png',
-    width = 480,
+    width = 640,
     height = 480,
     bg = 'transparent')
-g <- ggplot(averagesteps,aes(x=interval,y=mean)) + 
-     geom_line(aes(group=1),colour="blue") +
-     labs(title = "5 minute interval versus daily average steps",
-          y = "daily average steps")
+g <- ggplot(averagesteps,aes(x=interval,y=mean)) +
+     geom_line(aes(group=1),colour="blue")
+g <- g + labs(y = "daily average steps")
+g <- g + scale_x_discrete(breaks = activity$interval[sep(1,288,12)])
 
 maxind <- which(averagesteps$mean==max(averagesteps$mean))
 maxval <- averagesteps$mean[maxind]
 maxspot <- averagesteps$interval[maxind]
+
 g + geom_point(aes(x=maxspot,y=maxval),colour='red') +
-     annotate("text",x=maxspot+10,y=maxval,
-              label = "maximum steps at 104th interval\n(8:35 AM)",
+     annotate("text",x=maxspot,y=maxval,
+              label = "maximum steps at 104th interval (8:35 AM)",
               hjust = 0)
+
 dev.off()
 
 table(is.na(activity[,1]))
@@ -119,9 +121,7 @@ g+facet_grid(.~daytype)
 test <- activity
 
 
-timetest <- test$interval
-
-
+test$interval <- sprintf('%04d',test$interval)
 test$interval <- gsub(pattern = '([0-9]{1,2})([0-9]{2})',
               replacement = '\\1:\\2',
               x = test$interval)
@@ -136,3 +136,4 @@ g <- ggplot(taveragesteps,aes(x=interval,y=mean)) +
      labs(title = "5 minute interval versus daily average steps",
           y = "daily average steps")
 g + scale_x_discrete(breaks = taveragesteps$interval[seq(1,288,12)])
+
